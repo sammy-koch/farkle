@@ -139,10 +139,19 @@ class Game {
       }
     }
     // 3 pairs
+    //TODO fix this because it counts for 333441
     if(diceGroups.size() == 3 && shake.size() == 6) {
-      pointTally += 1500;
-      for(auto &d : shake) {
-        d.setInShaker(false);
+      bool falseAlarm  = false;
+      for(auto &p : diceGroups) {
+        if(p.second.size() != 2) {
+          falseAlarm = true;
+        }
+      }
+      if(!falseAlarm) {
+        pointTally += 1500;
+        for(auto &d : shake) {
+          d.setInShaker(false);
+        }
       }
     }
     // 2 triplets

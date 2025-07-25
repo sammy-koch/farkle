@@ -81,34 +81,91 @@ class Game {
     }
     
     for(auto &p : diceGroups) {
-      if(p.second.size() == 6) {
+      if(p.second.size() == 6) { // 6 of a kind
         pointTally += 3000;
-
-      } else if(p.second.size() == 5) {
+        for(auto &d : p.second) {
+          d.setInShaker(false);
+        }
+      } else if(p.second.size() == 5) { // 5 of a kind
         pointTally += 2000;
         for(auto &d : p.second) {
           d.setInShaker(false);
         }
-      } else if(p.second.size() == 4) {
+      } else if(p.second.size() == 4) { // 4 of a kind AND 4 + pair
         pointTally += 1000;
         for(auto &d : p.second) {
           d.setInShaker(false);
+        }
+        if(diceGroups.size() == 2 && shake.size() == 6) {
+          pointTally += 500;
+          for(auto &d : shake) {
+            d.setInShaker(false);
+          }
         }
       }
     }
     // straight
     if(diceGroups.size() == 6) {
       pointTally += 1500;
+      for(auto &d : shake) {
+        d.setInShaker(false);
+      }
     }
     // 3 pairs
-
-    // 4 + pair
-
+    if(diceGroups.size() == 3 && shake.size() == 6) {
+      pointTally += 1500;
+      for(auto &d : shake) {
+        d.setInShaker(false);
+      }
+    }
     // 2 triplets
+    if(diceGroups.size() == 2 && shake.size() == 6) {
+      pointTally += 2500;
+      for(auto &d : shake) {
+        d.setInShaker(false);
+      }
+    }
 
     // 3 of a kinds
-
+    for(auto &p : diceGroups) {
+      if(p.second.size() == 3) {
+        bool overlap = false;
+        for(auto &d : p.second) {
+          if(!d.getInShaker()) {
+            overlap = true;
+          }
+        }
+        if(!overlap) {
+          pointTally += p.first * 100;
+          for(auto &d : p.second) {
+            d.setInShaker(false);
+          }
+        }
+      }
+    }
     // 1s and 5s
+    // TODO make sure no overlap with previous
+    if(diceGroups[1].size() != 0) {
+      for(auto &d : diceGroups[1]) {
+        if(d.getInShaker()) {
+          pointTally += 100;
+        }
+      }
+    }
+    if(diceGroups[5].size() != 0) {
+      for(auto &d : diceGroups[5]) {
+        if(d.getInShaker()) {
+          pointTally += 50;
+        }
+      }
+    }
+
+    for(auto &d : diceGroups[1]) {
+      d.setInShaker(false);
+    }
+    for(auto &d : diceGroups[5]) {
+      d.setInShaker(false);
+    }
 
     // update shaker
     shake.erase(std::remove_if(shake.begin(), shake.end(),
@@ -117,7 +174,6 @@ class Game {
                           }),
             shake.end());
     
-    // TODO make sure this happens at the end, and accounts for losing points
     return pointTally;
   }
 
